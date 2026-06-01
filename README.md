@@ -2,110 +2,116 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>睿财看板 | 欠款+现金+消费 | 三图一行</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>欠款现金看板</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-        body { background: #f0f4f9; padding: 24px 20px; color: #1a2c3e; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f0f4f9; padding: 16px 12px; color: #1a2c3e; }
         .password-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
             display: flex; align-items: center; justify-content: center; z-index: 2000;
         }
         .password-modal {
-            background: white; border-radius: 40px; padding: 32px 28px; width: 320px; text-align: center;
+            background: white; border-radius: 40px; padding: 32px 24px; width: 300px; text-align: center;
         }
         .password-modal i { font-size: 48px; color: #1f5e7e; margin-bottom: 16px; }
-        .password-modal input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 60px; border: 1px solid #cbdde9; text-align: center; }
+        .password-modal input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 60px; border: 1px solid #cbdde9; text-align: center; font-size: 1rem; }
         .password-modal button { background: #1f5e7e; border: none; padding: 10px; border-radius: 60px; color: white; font-weight: 600; width: 100%; cursor: pointer; }
-        .container { max-width: 1600px; margin: 0 auto; display: none; }
-        /* KPI 卡片 */
+        .container { max-width: 1200px; margin: 0 auto; display: none; }
+        /* KPI 卡片 - 更紧凑适应手机 */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 22px;
-            margin-bottom: 28px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
         }
         .kpi-card {
-            background: white; border-radius: 28px; padding: 20px 24px;
-            border: 1px solid #e2edf2; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            background: white; border-radius: 24px; padding: 14px 16px;
+            border: 1px solid #e2edf2; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
-        .kpi-title { font-size: 0.85rem; font-weight: 600; color: #5b7a99; margin-bottom: 10px; }
-        .kpi-number { font-size: 1.9rem; font-weight: 800; color: #1f4e6e; line-height: 1.2; word-break: break-word; }
-        .trend-badge { background: #eef2fa; border-radius: 40px; padding: 4px 12px; font-size: 0.7rem; display: inline-block; margin-top: 8px; }
+        .kpi-title { font-size: 0.7rem; font-weight: 600; color: #5b7a99; margin-bottom: 6px; }
+        .kpi-number { font-size: 1.4rem; font-weight: 800; color: #1f4e6e; line-height: 1.2; word-break: break-word; }
+        .trend-badge { background: #eef2fa; border-radius: 40px; padding: 3px 10px; font-size: 0.6rem; display: inline-block; margin-top: 6px; }
         /* 图表卡片 */
         .chart-card {
-            background: white; border-radius: 28px; padding: 20px 20px 12px 20px;
-            margin-bottom: 32px; border: 1px solid #e2edf2;
+            background: white; border-radius: 28px; padding: 16px 12px 12px 12px;
+            margin-bottom: 24px; border: 1px solid #e2edf2;
         }
         .section-header {
             display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; margin-bottom: 20px; gap: 12px;
+            flex-wrap: wrap; margin-bottom: 16px; gap: 10px;
         }
         .year-selector {
-            display: flex; gap: 12px; background: #f8fafd; padding: 5px 12px; border-radius: 60px;
+            display: flex; gap: 8px; background: #f8fafd; padding: 4px 10px; border-radius: 60px;
         }
         .year-btn {
-            background: transparent; border: none; padding: 6px 20px; border-radius: 40px;
-            font-weight: 600; cursor: pointer; color: #4f6f8f;
+            background: transparent; border: none; padding: 4px 14px; border-radius: 40px;
+            font-weight: 600; font-size: 0.8rem; cursor: pointer; color: #4f6f8f;
         }
         .year-btn.active { background: #1f5e7e; color: white; }
-        /* 三图一行 */
+        /* 三图一行 - 移动端改为垂直，PC端同行 */
         .three-charts-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 10px;
+            gap: 16px;
+            margin-bottom: 8px;
         }
         .chart-item {
             flex: 1;
             min-width: 260px;
-            height: 340px;
+            height: 300px;
         }
-        .footer-note { text-align: right; font-size: 0.7rem; color: #6f8faa; margin-top: 16px; }
+        @media (max-width: 700px) {
+            .chart-item { min-width: 100%; height: 280px; }
+        }
+        .footer-note { text-align: right; font-size: 0.6rem; color: #6f8faa; margin-top: 12px; }
         /* 双表格并列 */
         .tables-row {
-            display: flex; flex-wrap: wrap; gap: 24px; margin-top: 8px;
+            display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px;
         }
         .table-card {
             flex: 1; background: white; border-radius: 28px; border: 1px solid #e2edf2;
             overflow: hidden; display: flex; flex-direction: column;
         }
-        .table-header { background: #f9fbfe; padding: 16px 24px; font-weight: 700; font-size: 1.2rem; border-bottom: 1px solid #e2edf2; }
-        .table-content { padding: 20px 24px; flex: 1; }
+        .table-header { background: #f9fbfe; padding: 12px 18px; font-weight: 700; font-size: 1rem; border-bottom: 1px solid #e2edf2; }
+        .table-content { padding: 14px 16px; flex: 1; }
         .quick-add-bar {
-            display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
-            margin-bottom: 20px; background: #f9fbfe; padding: 12px 16px; border-radius: 24px;
+            display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+            margin-bottom: 16px; background: #f9fbfe; padding: 10px 12px; border-radius: 24px;
         }
         .person-btn {
-            background: #eef2fa; border: none; padding: 6px 20px; border-radius: 40px;
-            font-weight: 600; cursor: pointer; color: #1f5e7e;
+            background: #eef2fa; border: none; padding: 4px 16px; border-radius: 40px;
+            font-weight: 600; font-size: 0.75rem; cursor: pointer; color: #1f5e7e;
         }
         .person-btn.active { background: #1f5e7e; color: white; }
-        .quick-field { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .quick-field { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .quick-field select, .quick-field input {
-            padding: 6px 12px; border-radius: 40px; border: 1px solid #cbdde9;
-            background: white; font-size: 0.8rem;
+            padding: 5px 10px; border-radius: 40px; border: 1px solid #cbdde9;
+            background: white; font-size: 0.75rem;
         }
-        .btn-primary { background: #2c7a4d; padding: 6px 18px; color: white; border: none; border-radius: 40px; font-weight: 500; cursor: pointer; }
-        .data-table { overflow-x: auto; max-height: 500px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e9f0f3; }
+        .btn-primary { background: #2c7a4d; padding: 5px 14px; color: white; border: none; border-radius: 40px; font-weight: 500; font-size: 0.75rem; cursor: pointer; }
+        .data-table { overflow-x: auto; max-height: 420px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e9f0f3; }
         th { background: #f8fafd; font-weight: 600; color: #2c5778; position: sticky; top: 0; }
-        .action-icon { cursor: pointer; margin: 0 4px; background: #ecf3f8; padding: 4px 8px; border-radius: 30px; font-size: 0.7rem; display: inline-block; }
-        @media (max-width: 1000px) { .three-charts-row { flex-direction: column; } .tables-row { flex-direction: column; } }
+        .action-icon { cursor: pointer; margin: 0 2px; background: #ecf3f8; padding: 3px 8px; border-radius: 30px; font-size: 0.65rem; display: inline-block; }
+        @media (max-width: 680px) {
+            .quick-field { width: 100%; justify-content: space-between; }
+            .kpi-number { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
 <div id="passwordOverlay" class="password-overlay">
     <div class="password-modal">
         <i class="fas fa-lock"></i>
-        <h3>财务看板 · 安全验证</h3>
-        <input type="password" id="passwordInput" placeholder="请输入访问密码" autocomplete="off">
-        <button id="unlockBtn">解锁进入</button>
-        <div id="pwdError" style="color:#c2412c; margin-top:12px; font-size:0.8rem;"></div>
+        <h3>访问验证</h3>
+        <input type="password" id="passwordInput" placeholder="输入密码" autocomplete="off">
+        <button id="unlockBtn">进入</button>
+        <div id="pwdError" style="color:#c2412c; margin-top:12px; font-size:0.75rem;"></div>
     </div>
 </div>
 
@@ -113,16 +119,16 @@
     <!-- KPI 卡片 -->
     <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-title"><i class="fas fa-coins"></i> 最新总欠款</div><div class="kpi-number" id="latestTotalDebt">¥0</div><div class="trend-badge" id="debtDateInfo">—</div></div>
-        <div class="kpi-card"><div class="kpi-title"><i class="fas fa-chart-line"></i> 月均欠款 (当年)</div><div class="kpi-number" id="avgMonthlyDebt">¥0</div><div class="trend-badge">各月欠款平均值</div></div>
-        <div class="kpi-card"><div class="kpi-title"><i class="fas fa-chart-line"></i> 月均消费 (当年)</div><div class="kpi-number" id="avgMonthlyConsume">¥0</div><div class="trend-badge">工资12.5k + 欠款增加 + 现金减少</div></div>
-        <div class="kpi-card"><div class="kpi-title"><i class="fas fa-piggy-bank"></i> 现有存款 (余额宝+纸币)</div><div class="kpi-number" id="totalDeposit">¥0</div><div class="trend-badge">稳健资产</div></div>
-        <div class="kpi-card"><div class="kpi-title"><i class="fas fa-calendar-alt"></i> 最新统计日期</div><div class="kpi-number" id="latestDateDisplay">—</div><div class="trend-badge">欠款/现金同步</div></div>
+        <div class="kpi-card"><div class="kpi-title"><i class="fas fa-chart-line"></i> 月均欠款</div><div class="kpi-number" id="avgMonthlyDebt">¥0</div><div class="trend-badge">当年月均</div></div>
+        <div class="kpi-card"><div class="kpi-title"><i class="fas fa-chart-line"></i> 月均消费</div><div class="kpi-number" id="avgMonthlyConsume">¥0</div><div class="trend-badge">工资12.5k+欠款↑+现金↓</div></div>
+        <div class="kpi-card"><div class="kpi-title"><i class="fas fa-piggy-bank"></i> 现有存款</div><div class="kpi-number" id="totalDeposit">¥0</div><div class="trend-badge">余额宝+纸币</div></div>
+        <div class="kpi-card"><div class="kpi-title"><i class="fas fa-calendar-alt"></i> 最新统计</div><div class="kpi-number" id="latestDateDisplay">—</div><div class="trend-badge">欠款/现金</div></div>
     </div>
 
-    <!-- 三图一行：欠款柱状图 + 现金柱状图 + 消费柱状图 -->
+    <!-- 三图一行 -->
     <div class="chart-card">
         <div class="section-header">
-            <h2><i class="fas fa-chart-bar"></i> 月度趋势 · 柱状分析</h2>
+            <h2 style="font-size:1.1rem;"><i class="fas fa-chart-bar"></i> 月度趋势</h2>
             <div class="year-selector" id="trendYearSelector">
                 <button data-year="2026" class="year-btn active">2026</button>
                 <button data-year="2025" class="year-btn">2025</button>
@@ -134,13 +140,13 @@
             <div class="chart-item" id="cashBarChart"></div>
             <div class="chart-item" id="consumeBarChart"></div>
         </div>
-        <div class="footer-note">※ 消费 = 12500 + (上月现金-本月现金) + (本月欠款-上月欠款)；无现金数据时仅按欠款增加 + 12500 估算</div>
+        <div class="footer-note">※ 消费 = 12500 + (上月现金-本月现金) + (本月欠款-上月欠款)</div>
     </div>
 
-    <!-- 双表格并列 -->
+    <!-- 双表格：欠款 + 现金 -->
     <div class="tables-row">
         <div class="table-card">
-            <div class="table-header"><i class="fas fa-list-ul"></i> 欠款明细表 · 可编辑</div>
+            <div class="table-header"><i class="fas fa-list-ul"></i> 欠款明细 · 可编辑</div>
             <div class="table-content">
                 <div class="quick-add-bar">
                     <div style="font-weight:600;">➕ 快捷新增：</div>
@@ -152,18 +158,18 @@
                             <option value="信用卡">信用卡</option>
                             <option value="其他欠款">其他欠款</option>
                         </select>
-                        <input type="number" id="debtAmountInput" placeholder="金额(¥)" step="0.01" value="0">
-                        <input type="date" id="debtDateInput" value="2026-06-01">
+                        <input type="number" id="debtAmountInput" placeholder="金额" step="0.01" value="0" style="width:100px;">
+                        <input type="date" id="debtDateInput" value="2026-06-01" style="width:120px;">
                         <button id="addDebtQuickBtn" class="btn-primary"><i class="fas fa-save"></i> 新增</button>
                     </div>
                 </div>
                 <div class="data-table">
-                    <table><thead><tr><th>统计时间</th><th>欠款人</th><th>类别</th><th>金额(¥)</th><th>操作</th></tr></thead><tbody id="debtTbody"></tbody></table>
+                    <table><thead><tr><th>日期</th><th>欠款人</th><th>类别</th><th>金额(¥)</th><th>操作</th></tr></thead><tbody id="debtTbody"></tbody></table>
                 </div>
             </div>
         </div>
         <div class="table-card">
-            <div class="table-header"><i class="fas fa-money-bill-wave"></i> 现金流水明细 · 可编辑</div>
+            <div class="table-header"><i class="fas fa-money-bill-wave"></i> 现金流水 · 可编辑</div>
             <div class="table-content">
                 <div class="quick-add-bar">
                     <div style="font-weight:600;">➕ 快捷新增：</div>
@@ -175,8 +181,8 @@
                             <option value="纸币">纸币</option>
                             <option value="其他现金">其他现金</option>
                         </select>
-                        <input type="number" id="cashAmountInput" placeholder="金额(¥)" step="0.01" value="0">
-                        <input type="date" id="cashDateInput" value="2026-06-01">
+                        <input type="number" id="cashAmountInput" placeholder="金额" step="0.01" value="0" style="width:100px;">
+                        <input type="date" id="cashDateInput" value="2026-06-01" style="width:120px;">
                         <button id="addCashQuickBtn" class="btn-primary"><i class="fas fa-save"></i> 新增</button>
                     </div>
                 </div>
@@ -189,7 +195,9 @@
 </div>
 
 <script>
-    // ======================= 完整欠款数据 (2024-2026) =======================
+    // --------------------------------------------------------------
+    // 完整欠款数据集 (2024-2026 基于用户历史)
+    // --------------------------------------------------------------
     const FULL_DEBTS_DATA = [
         { date: "2024-07-08", debtor: "梁", category: "花呗", amount: 5625.39 }, { date: "2024-07-08", debtor: "梁", category: "白条", amount: 1749.75 }, { date: "2024-07-08", debtor: "梁", category: "信用卡", amount: 9439.38 }, { date: "2024-07-08", debtor: "王", category: "花呗", amount: 7144.69 },
         { date: "2024-07-23", debtor: "梁", category: "花呗", amount: 5136.31 }, { date: "2024-07-23", debtor: "梁", category: "白条", amount: 1166.5 }, { date: "2024-07-23", debtor: "梁", category: "信用卡", amount: 10396.58 }, { date: "2024-07-23", debtor: "王", category: "花呗", amount: 7035.49 },
@@ -234,7 +242,7 @@
         { date: "2026-06-01", debtor: "梁", category: "花呗", amount: 0 }, { date: "2026-06-01", debtor: "梁", category: "招商信用卡（账期到10月，每月500）", amount: 7185.72 }, { date: "2026-06-01", debtor: "王", category: "花呗", amount: 10658.84 }, { date: "2026-06-01", debtor: "王", category: "信用卡", amount: 2252.05 }
     ];
 
-    // 现金数据 (仅2026年有数据，2024/2025 无记录)
+    // 现金数据 (仅2026年)
     const FULL_CASH_DATA = [
         { date: "2026-06-01", debtor: "梁", account: "微信", amount: 39 }, { date: "2026-06-01", debtor: "梁", account: "银行卡", amount: 2.67 },
         { date: "2026-06-01", debtor: "王", account: "支付宝", amount: 79 }, { date: "2026-06-01", debtor: "王", account: "余额宝", amount: 11899.41 }, { date: "2026-06-01", debtor: "王", account: "纸币", amount: 1350 },
@@ -254,192 +262,155 @@
     let debtChart, cashChart, consumeChart;
 
     function formatMoneyInt(v) { return Math.round(v).toLocaleString('en-US'); }
+    function getTotalDebtByDate(d) { return debts.filter(x=>x.date===d).reduce((s,x)=>s+x.amount,0); }
+    function getTotalCashByDate(d) { return cashRecords.filter(x=>x.date===d).reduce((s,x)=>s+x.amount,0); }
+    function getDepositByDate(d) { return cashRecords.filter(x=>x.date===d && (x.account==="余额宝"||x.account==="纸币")).reduce((s,x)=>s+x.amount,0); }
 
-    function getTotalDebtByDate(date) { return debts.filter(d => d.date === date).reduce((s, d) => s + d.amount, 0); }
-    function getTotalCashByDate(date) { return cashRecords.filter(c => c.date === date).reduce((s, c) => s + c.amount, 0); }
-    function getDepositByDate(date) { return cashRecords.filter(c => c.date === date && (c.account === "余额宝" || c.account === "纸币")).reduce((s,c) => s + c.amount, 0); }
-
-    // 获取年份中各月份最后一条数据的欠款/现金总额
     function getYearlyMonthlyData(year, type) {
-        const source = type === 'debt' ? debts : cashRecords;
-        const yearDates = [...new Set(source.filter(i => i.date.startsWith(year)).map(i => i.date))].sort();
-        const monthlyMap = new Map();
-        for (let date of yearDates) {
-            const monthNum = parseInt(date.substring(5,7), 10);
-            const value = type === 'debt' ? getTotalDebtByDate(date) : getTotalCashByDate(date);
-            if (!monthlyMap.has(monthNum) || date > monthlyMap.get(monthNum).lastDate) {
-                monthlyMap.set(monthNum, { value, lastDate: date });
-            }
+        const src = type === 'debt' ? debts : cashRecords;
+        const dates = [...new Set(src.filter(i=>i.date.startsWith(year)).map(i=>i.date))].sort();
+        const map = new Map();
+        for(let date of dates){
+            let month = parseInt(date.slice(5,7),10);
+            let val = type==='debt' ? getTotalDebtByDate(date) : getTotalCashByDate(date);
+            if(!map.has(month) || date > map.get(month).lastDate) map.set(month,{value:val,lastDate:date});
         }
-        const sorted = Array.from(monthlyMap.keys()).sort((a,b)=>a-b);
-        const labels = sorted.map(m => `${m}月`);
-        const values = sorted.map(m => monthlyMap.get(m).value);
-        return { labels, values, rawMonths: sorted };
+        let months = Array.from(map.keys()).sort((a,b)=>a-b);
+        return { labels: months.map(m=>`${m}月`), values: months.map(m=>map.get(m).value), rawMonths: months };
     }
 
-    // 消费计算: 支持无现金年份（仅用欠款增加 + 12500）
-    function getMonthlyConsumption(year) {
-        const debtMonthly = getYearlyMonthlyData(year, 'debt');
-        const cashMonthly = getYearlyMonthlyData(year, 'cash');
-        if (debtMonthly.labels.length === 0) return { labels: [], values: [] };
-        // 所有月份集合（欠款月份为主，现金如果有则合并）
-        let allMonthsSet = new Set(debtMonthly.rawMonths);
-        if (cashMonthly.rawMonths.length) cashMonthly.rawMonths.forEach(m => allMonthsSet.add(m));
-        const sortedMonths = Array.from(allMonthsSet).sort((a,b)=>a-b);
-        const consumptionMap = new Map();
-        for (let i = 1; i < sortedMonths.length; i++) {
-            const monthCurr = sortedMonths[i];
-            const monthPrev = sortedMonths[i-1];
-            // 欠款值（必有）
-            const debtCurr = debtMonthly.values[debtMonthly.rawMonths.indexOf(monthCurr)] ?? 0;
-            const debtPrev = debtMonthly.values[debtMonthly.rawMonths.indexOf(monthPrev)] ?? 0;
-            const debtIncrease = Math.max(0, debtCurr - debtPrev);
-            // 现金值，若当年无现金数据则 cashCurr = cashPrev = 0，现金减少为0
-            let cashCurr = 0, cashPrev = 0;
-            if (cashMonthly.rawMonths.length) {
-                cashCurr = cashMonthly.values[cashMonthly.rawMonths.indexOf(monthCurr)] ?? 0;
-                cashPrev = cashMonthly.values[cashMonthly.rawMonths.indexOf(monthPrev)] ?? 0;
-            }
-            const cashDecrease = Math.max(0, cashPrev - cashCurr);
-            const consume = 12500 + debtIncrease + cashDecrease;
-            consumptionMap.set(monthCurr, consume);
+    function getMonthlyConsumption(year){
+        const debt = getYearlyMonthlyData(year,'debt');
+        const cash = getYearlyMonthlyData(year,'cash');
+        if(debt.labels.length===0) return {labels:[],values:[]};
+        let allMonths = new Set(debt.rawMonths);
+        cash.rawMonths.forEach(m=>allMonths.add(m));
+        let sorted = Array.from(allMonths).sort((a,b)=>a-b);
+        let consMap = new Map();
+        for(let i=1;i<sorted.length;i++){
+            let cur = sorted[i], prev = sorted[i-1];
+            let debtCur = debt.values[debt.rawMonths.indexOf(cur)] ?? 0;
+            let debtPrev = debt.values[debt.rawMonths.indexOf(prev)] ?? 0;
+            let cashCur = cash.values[cash.rawMonths.indexOf(cur)] ?? 0;
+            let cashPrev = cash.values[cash.rawMonths.indexOf(prev)] ?? 0;
+            let debtInc = Math.max(0, debtCur - debtPrev);
+            let cashDec = Math.max(0, cashPrev - cashCur);
+            consMap.set(cur, 12500 + debtInc + cashDec);
         }
-        const monthsOrder = Array.from(consumptionMap.keys()).sort();
-        const labels = monthsOrder.map(m => `${m}月`);
-        const values = monthsOrder.map(m => consumptionMap.get(m));
-        return { labels, values };
+        let monthsOrder = Array.from(consMap.keys()).sort();
+        return { labels: monthsOrder.map(m=>`${m}月`), values: monthsOrder.map(m=>consMap.get(m)) };
     }
 
-    function renderAllCharts() {
-        // 欠款柱状图
-        const debtData = getYearlyMonthlyData(currentYear, 'debt');
-        if (debtChart) debtChart.dispose();
-        debtChart = echarts.init(document.getElementById('debtBarChart'));
-        debtChart.setOption({
-            tooltip: { trigger: 'axis', valueFormatter: v => '¥' + v.toFixed(2) },
-            xAxis: { type: 'category', data: debtData.labels, name: '月份' },
-            yAxis: { type: 'value', name: '欠款总额 (¥)', axisLabel: { formatter: val => '¥' + Math.round(val).toLocaleString() } },
-            series: [{ type: 'bar', data: debtData.values, itemStyle: { color: '#e07a5f', borderRadius: [8,8,0,0], label: { show: true, position: 'top', formatter: p => Math.round(p.value).toLocaleString(), fontWeight: 'bold' } } }]
-        });
-        // 现金柱状图
-        const cashData = getYearlyMonthlyData(currentYear, 'cash');
-        if (cashChart) cashChart.dispose();
-        cashChart = echarts.init(document.getElementById('cashBarChart'));
-        cashChart.setOption({
-            tooltip: { trigger: 'axis', valueFormatter: v => '¥' + v.toFixed(2) },
-            xAxis: { type: 'category', data: cashData.labels, name: '月份' },
-            yAxis: { type: 'value', name: '现金总额 (¥)', axisLabel: { formatter: val => '¥' + Math.round(val).toLocaleString() } },
-            series: [{ type: 'bar', data: cashData.values, itemStyle: { color: '#3b82b6', borderRadius: [8,8,0,0], label: { show: true, position: 'top', formatter: p => Math.round(p.value).toLocaleString(), fontWeight: 'bold' } } }]
-        });
-        // 消费柱状图
+    function resizeAllCharts() {
+        if(debtChart) debtChart.resize();
+        if(cashChart) cashChart.resize();
+        if(consumeChart) consumeChart.resize();
+    }
+    window.addEventListener('resize', () => { setTimeout(resizeAllCharts, 100); });
+
+    function renderAllCharts(){
+        const debtData = getYearlyMonthlyData(currentYear,'debt');
+        const cashData = getYearlyMonthlyData(currentYear,'cash');
         const consumeData = getMonthlyConsumption(currentYear);
-        if (consumeChart) consumeChart.dispose();
+        if(debtChart) debtChart.dispose();
+        debtChart = echarts.init(document.getElementById('debtBarChart'));
+        debtChart.setOption({ tooltip:{trigger:'axis',valueFormatter:v=>'¥'+v.toFixed(2)}, grid:{containLabel:true}, xAxis:{type:'category',data:debtData.labels,name:'月份',axisLabel:{rotate:0}}, yAxis:{type:'value',name:'欠款(¥)',axisLabel:{formatter:v=>'¥'+Math.round(v).toLocaleString()}}, series:[{type:'bar',data:debtData.values,itemStyle:{color:'#e07a5f',borderRadius:[6,6,0,0],label:{show:true,position:'top',formatter:p=>Math.round(p.value).toLocaleString(),fontWeight:'bold'}}}] });
+        if(cashChart) cashChart.dispose();
+        cashChart = echarts.init(document.getElementById('cashBarChart'));
+        cashChart.setOption({ tooltip:{trigger:'axis',valueFormatter:v=>'¥'+v.toFixed(2)}, grid:{containLabel:true}, xAxis:{type:'category',data:cashData.labels,name:'月份'}, yAxis:{type:'value',name:'现金(¥)',axisLabel:{formatter:v=>'¥'+Math.round(v).toLocaleString()}}, series:[{type:'bar',data:cashData.values,itemStyle:{color:'#3b82b6',borderRadius:[6,6,0,0],label:{show:true,position:'top',formatter:p=>Math.round(p.value).toLocaleString()}}}] });
+        if(consumeChart) consumeChart.dispose();
         consumeChart = echarts.init(document.getElementById('consumeBarChart'));
-        consumeChart.setOption({
-            tooltip: { trigger: 'axis', valueFormatter: v => '¥' + v.toFixed(2) },
-            xAxis: { type: 'category', data: consumeData.labels, name: '月份' },
-            yAxis: { type: 'value', name: '月均消费 (¥)', axisLabel: { formatter: val => '¥' + Math.round(val).toLocaleString() } },
-            series: [{ type: 'bar', data: consumeData.values, itemStyle: { color: '#2c7a4d', borderRadius: [8,8,0,0], label: { show: true, position: 'top', formatter: p => Math.round(p.value).toLocaleString(), fontWeight: 'bold' } } }]
-        });
-        // 更新KPI: 月均欠款 + 月均消费
-        const avgDebt = debtData.values.length ? debtData.values.reduce((a,b)=>a+b,0)/debtData.values.length : 0;
+        consumeChart.setOption({ tooltip:{trigger:'axis',valueFormatter:v=>'¥'+v.toFixed(2)}, grid:{containLabel:true}, xAxis:{type:'category',data:consumeData.labels,name:'月份'}, yAxis:{type:'value',name:'消费(¥)',axisLabel:{formatter:v=>'¥'+Math.round(v).toLocaleString()}}, series:[{type:'bar',data:consumeData.values,itemStyle:{color:'#2c7a4d',borderRadius:[6,6,0,0],label:{show:true,position:'top',formatter:p=>Math.round(p.value).toLocaleString()}}}] });
+        let avgDebt = debtData.values.length ? debtData.values.reduce((a,b)=>a+b,0)/debtData.values.length : 0;
+        let avgConsume = consumeData.values.length ? consumeData.values.reduce((a,b)=>a+b,0)/consumeData.values.length : 0;
         document.getElementById('avgMonthlyDebt').innerHTML = `¥${formatMoneyInt(avgDebt)}`;
-        const avgConsume = consumeData.values.length ? consumeData.values.reduce((a,b)=>a+b,0)/consumeData.values.length : 0;
         document.getElementById('avgMonthlyConsume').innerHTML = `¥${formatMoneyInt(avgConsume)}`;
     }
 
-    function updateKPI() {
-        const allDebtDates = [...new Set(debts.map(d=>d.date))].sort();
-        const latestDate = allDebtDates[allDebtDates.length-1];
-        if (latestDate) {
-            const totalDebt = getTotalDebtByDate(latestDate);
-            const deposit = getDepositByDate(latestDate);
-            document.getElementById('latestTotalDebt').innerHTML = `¥${formatMoneyInt(totalDebt)}`;
-            document.getElementById('totalDeposit').innerHTML = `¥${formatMoneyInt(deposit)}`;
-            document.getElementById('latestDateDisplay').innerHTML = latestDate;
-            document.getElementById('debtDateInfo').innerHTML = `截至 ${latestDate}`;
+    function updateKPI(){
+        let allDates = [...new Set(debts.map(d=>d.date))].sort();
+        let latest = allDates[allDates.length-1];
+        if(latest){
+            document.getElementById('latestTotalDebt').innerHTML = `¥${formatMoneyInt(getTotalDebtByDate(latest))}`;
+            document.getElementById('totalDeposit').innerHTML = `¥${formatMoneyInt(getDepositByDate(latest))}`;
+            document.getElementById('latestDateDisplay').innerHTML = latest;
+            document.getElementById('debtDateInfo').innerHTML = `截至 ${latest}`;
         }
         renderAllCharts();
     }
 
-    function renderDebtTable() {
-        const tbody = document.getElementById('debtTbody');
+    function renderDebtTable(){
+        let tbody = document.getElementById('debtTbody');
         tbody.innerHTML = '';
-        debts.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(d => {
-            tbody.innerHTML += `<tr><td>${d.date}</td><td>${d.debtor}</td><td>${d.category}</td><td>¥${d.amount.toFixed(2)}</td><td><span class="action-icon edit-debt" data-id="${d.id}">✏️编辑</span> <span class="action-icon del-debt" data-id="${d.id}">删除</span></td></tr>`;
+        debts.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(d=>{
+            tbody.innerHTML += `<tr><td>${d.date}</td><td>${d.debtor}</td><td>${d.category}</td><td>¥${d.amount.toFixed(2)}</td><td><span class="action-icon edit-debt" data-id="${d.id}">✏️</span> <span class="action-icon del-debt" data-id="${d.id}">🗑️</span></td></tr>`;
         });
         updateKPI();
     }
-    function renderCashTable() {
-        const tbody = document.getElementById('cashTbody');
+    function renderCashTable(){
+        let tbody = document.getElementById('cashTbody');
         tbody.innerHTML = '';
-        cashRecords.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(c => {
-            tbody.innerHTML += `<tr><td>${c.date}</td><td>${c.debtor}</td><td>${c.account}</td><td>¥${c.amount.toFixed(2)}</td><td><span class="action-icon edit-cash" data-id="${c.id}">✏️编辑</span> <span class="action-icon del-cash" data-id="${c.id}">删除</span></td></tr>`;
+        cashRecords.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(c=>{
+            tbody.innerHTML += `<tr><td>${c.date}</td><td>${c.debtor}</td><td>${c.account}</td><td>¥${c.amount.toFixed(2)}</td><td><span class="action-icon edit-cash" data-id="${c.id}">✏️</span> <span class="action-icon del-cash" data-id="${c.id}">🗑️</span></td></tr>`;
         });
         updateKPI();
     }
 
-    function initData() {
-        debts = FULL_DEBTS_DATA.map((d,idx) => ({ id: nextDebtId+idx, ...d, amount: Number(d.amount.toFixed(2)) }));
-        cashRecords = FULL_CASH_DATA.map((c,idx) => ({ id: nextCashId+idx, ...c, amount: Number(c.amount) }));
-        nextDebtId += debts.length;
-        nextCashId += cashRecords.length;
+    function initData(){
+        debts = FULL_DEBTS_DATA.map((d,i)=>({id:nextDebtId+i, ...d, amount:Number(d.amount.toFixed(2))}));
+        cashRecords = FULL_CASH_DATA.map((c,i)=>({id:nextCashId+i, ...c, amount:Number(c.amount)}));
+        nextDebtId += debts.length; nextCashId += cashRecords.length;
     }
-    function saveToLocal() { localStorage.setItem('financeFullFinal', JSON.stringify({ debts, cashRecords, nextDebtId, nextCashId })); }
-    function loadLocal() {
-        const raw = localStorage.getItem('financeFullFinal');
-        if (raw) { try { const d=JSON.parse(raw); debts=d.debts; cashRecords=d.cashRecords; nextDebtId=d.nextDebtId; nextCashId=d.nextCashId; } catch(e){ initData(); } }
+    function saveLocal(){ localStorage.setItem('financeFinalV2', JSON.stringify({debts,cashRecords,nextDebtId,nextCashId})); }
+    function loadLocal(){
+        let raw = localStorage.getItem('financeFinalV2');
+        if(raw){ try{ let d=JSON.parse(raw); debts=d.debts; cashRecords=d.cashRecords; nextDebtId=d.nextDebtId; nextCashId=d.nextCashId; }catch(e){ initData(); } }
         else initData();
         renderDebtTable(); renderCashTable();
     }
 
-    function addDebt(rec) { debts.push({ id: nextDebtId++, ...rec }); renderDebtTable(); saveToLocal(); }
-    function updateDebt(id, amt) { const idx=debts.findIndex(d=>d.id===id); if(idx!==-1){ debts[idx].amount=amt; renderDebtTable(); saveToLocal(); } }
-    function deleteDebt(id) { debts=debts.filter(d=>d.id!==id); renderDebtTable(); saveToLocal(); }
-    function addCash(rec) { cashRecords.push({ id: nextCashId++, ...rec }); renderCashTable(); saveToLocal(); }
-    function updateCash(id, amt) { const idx=cashRecords.findIndex(c=>c.id===id); if(idx!==-1){ cashRecords[idx].amount=amt; renderCashTable(); saveToLocal(); } }
-    function deleteCash(id) { cashRecords=cashRecords.filter(c=>c.id!==id); renderCashTable(); saveToLocal(); }
+    function addDebt(r){ debts.push({id:nextDebtId++, ...r}); renderDebtTable(); saveLocal(); }
+    function updateDebt(id,amt){ let idx=debts.findIndex(d=>d.id===id); if(idx!==-1){ debts[idx].amount=amt; renderDebtTable(); saveLocal(); } }
+    function deleteDebt(id){ debts=debts.filter(d=>d.id!==id); renderDebtTable(); saveLocal(); }
+    function addCash(r){ cashRecords.push({id:nextCashId++, ...r}); renderCashTable(); saveLocal(); }
+    function updateCash(id,amt){ let idx=cashRecords.findIndex(c=>c.id===id); if(idx!==-1){ cashRecords[idx].amount=amt; renderCashTable(); saveLocal(); } }
+    function deleteCash(id){ cashRecords=cashRecords.filter(c=>c.id!==id); renderCashTable(); saveLocal(); }
 
-    // 快捷新增欠款
-    let quickDebtPerson = "梁";
-    document.getElementById('quickDebtLiangBtn').onclick = () => { quickDebtPerson="梁"; document.getElementById('quickDebtLiangBtn').classList.add('active'); document.getElementById('quickDebtWangBtn').classList.remove('active'); };
-    document.getElementById('quickDebtWangBtn').onclick = () => { quickDebtPerson="王"; document.getElementById('quickDebtWangBtn').classList.add('active'); document.getElementById('quickDebtLiangBtn').classList.remove('active'); };
-    document.getElementById('addDebtQuickBtn').onclick = () => {
-        const category = document.getElementById('debtCategorySelect').value;
-        const amount = parseFloat(document.getElementById('debtAmountInput').value);
-        const date = document.getElementById('debtDateInput').value;
-        if (!date || isNaN(amount)) { alert("完整填写"); return; }
-        addDebt({ date, debtor: quickDebtPerson, category, amount });
-        document.getElementById('debtAmountInput').value = 0;
+    // 快捷新增
+    let quickDebtPerson="梁", quickCashPerson="梁";
+    document.getElementById('quickDebtLiangBtn').onclick=()=>{ quickDebtPerson="梁"; document.getElementById('quickDebtLiangBtn').classList.add('active'); document.getElementById('quickDebtWangBtn').classList.remove('active'); };
+    document.getElementById('quickDebtWangBtn').onclick=()=>{ quickDebtPerson="王"; document.getElementById('quickDebtWangBtn').classList.add('active'); document.getElementById('quickDebtLiangBtn').classList.remove('active'); };
+    document.getElementById('addDebtQuickBtn').onclick=()=>{
+        let cat=document.getElementById('debtCategorySelect').value, amt=parseFloat(document.getElementById('debtAmountInput').value), dt=document.getElementById('debtDateInput').value;
+        if(!dt||isNaN(amt)){ alert("完整填写"); return; }
+        addDebt({date:dt, debtor:quickDebtPerson, category:cat, amount:amt});
+        document.getElementById('debtAmountInput').value=0;
     };
-    let quickCashPerson = "梁";
-    document.getElementById('quickCashLiangBtn').onclick = () => { quickCashPerson="梁"; document.getElementById('quickCashLiangBtn').classList.add('active'); document.getElementById('quickCashWangBtn').classList.remove('active'); };
-    document.getElementById('quickCashWangBtn').onclick = () => { quickCashPerson="王"; document.getElementById('quickCashWangBtn').classList.add('active'); document.getElementById('quickCashLiangBtn').classList.remove('active'); };
-    document.getElementById('addCashQuickBtn').onclick = () => {
-        const account = document.getElementById('cashCategorySelect').value;
-        const amount = parseFloat(document.getElementById('cashAmountInput').value);
-        const date = document.getElementById('cashDateInput').value;
-        if (!date || isNaN(amount)) { alert("完整填写"); return; }
-        addCash({ date, debtor: quickCashPerson, account, amount });
-        document.getElementById('cashAmountInput').value = 0;
+    document.getElementById('quickCashLiangBtn').onclick=()=>{ quickCashPerson="梁"; document.getElementById('quickCashLiangBtn').classList.add('active'); document.getElementById('quickCashWangBtn').classList.remove('active'); };
+    document.getElementById('quickCashWangBtn').onclick=()=>{ quickCashPerson="王"; document.getElementById('quickCashWangBtn').classList.add('active'); document.getElementById('quickCashLiangBtn').classList.remove('active'); };
+    document.getElementById('addCashQuickBtn').onclick=()=>{
+        let acc=document.getElementById('cashCategorySelect').value, amt=parseFloat(document.getElementById('cashAmountInput').value), dt=document.getElementById('cashDateInput').value;
+        if(!dt||isNaN(amt)){ alert("完整填写"); return; }
+        addCash({date:dt, debtor:quickCashPerson, account:acc, amount:amt});
+        document.getElementById('cashAmountInput').value=0;
     };
 
-    // 编辑删除委托
-    document.getElementById('debtTbody').addEventListener('click', (e) => {
-        if(e.target.classList.contains('edit-debt')){ let id=parseInt(e.target.dataset.id); let d=debts.find(i=>i.id===id); let newAmt=prompt('修改金额', d.amount); if(newAmt) updateDebt(id, parseFloat(newAmt)); }
+    // 编辑删除事件
+    document.getElementById('debtTbody').addEventListener('click',(e)=>{
+        if(e.target.classList.contains('edit-debt')){ let id=parseInt(e.target.dataset.id); let d=debts.find(i=>i.id===id); let na=prompt('修改金额',d.amount); if(na) updateDebt(id,parseFloat(na)); }
         if(e.target.classList.contains('del-debt')) if(confirm('删除?')) deleteDebt(parseInt(e.target.dataset.id));
     });
-    document.getElementById('cashTbody').addEventListener('click', (e) => {
-        if(e.target.classList.contains('edit-cash')){ let id=parseInt(e.target.dataset.id); let c=cashRecords.find(i=>i.id===id); let newAmt=prompt('修改金额', c.amount); if(newAmt) updateCash(id, parseFloat(newAmt)); }
+    document.getElementById('cashTbody').addEventListener('click',(e)=>{
+        if(e.target.classList.contains('edit-cash')){ let id=parseInt(e.target.dataset.id); let c=cashRecords.find(i=>i.id===id); let na=prompt('修改金额',c.amount); if(na) updateCash(id,parseFloat(na)); }
         if(e.target.classList.contains('del-cash')) if(confirm('删除?')) deleteCash(parseInt(e.target.dataset.id));
     });
 
     // 年份切换
-    document.querySelectorAll('.year-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+    document.querySelectorAll('.year-btn').forEach(btn=>{
+        btn.addEventListener('click',()=>{
             document.querySelectorAll('.year-btn').forEach(b=>b.classList.remove('active'));
             btn.classList.add('active');
-            currentYear = btn.dataset.year;
+            currentYear=btn.dataset.year;
             renderAllCharts();
         });
     });
@@ -449,9 +420,9 @@
     const unlockBtn = document.getElementById('unlockBtn');
     const pwdInput = document.getElementById('passwordInput');
     const mainApp = document.getElementById('mainApp');
-    function unlock() { if(pwdInput.value === "864456"){ overlay.style.display='none'; mainApp.style.display='block'; loadLocal(); } else { document.getElementById('pwdError').innerText='密码错误'; pwdInput.value=''; } }
+    function unlock(){ if(pwdInput.value === "864456"){ overlay.style.display='none'; mainApp.style.display='block'; loadLocal(); setTimeout(resizeAllCharts, 200); } else { document.getElementById('pwdError').innerText='密码错误'; pwdInput.value=''; } }
     unlockBtn.onclick = unlock;
-    pwdInput.addEventListener('keypress', e => { if(e.key === 'Enter') unlock(); });
+    pwdInput.addEventListener('keypress', e=>{ if(e.key === 'Enter') unlock(); });
 </script>
 </body>
 </html>
