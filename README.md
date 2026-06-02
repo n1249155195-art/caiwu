@@ -21,6 +21,30 @@
         .password-modal input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 60px; border: 1px solid #cbdde9; text-align: center; font-size: 1rem; }
         .password-modal button { background: #1f5e7e; border: none; padding: 10px; border-radius: 60px; color: white; font-weight: 600; width: 100%; cursor: pointer; }
         .container { max-width: 1200px; margin: 0 auto; display: none; }
+        
+        /* 顶部保存按钮 */
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+        .save-btn {
+            background: #2c7a4d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
         /* KPI 卡片 - 更紧凑适应手机 */
         .kpi-grid {
             display: grid;
@@ -35,6 +59,43 @@
         .kpi-title { font-size: 0.7rem; font-weight: 600; color: #5b7a99; margin-bottom: 6px; }
         .kpi-number { font-size: 1.4rem; font-weight: 800; color: #1f4e6e; line-height: 1.2; word-break: break-word; }
         .trend-badge { background: #eef2fa; border-radius: 40px; padding: 3px 10px; font-size: 0.6rem; display: inline-block; margin-top: 6px; }
+
+        /* 新增间隔统计看板 */
+        .stats-card {
+            background: #fff9e6;
+            border: 1px solid #ffdca8;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+        .stats-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #b76b00;
+            margin-bottom: 8px;
+        }
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.75rem;
+        }
+        .stats-item {
+            flex: 1;
+            min-width: 120px;
+            background: white;
+            padding: 6px 10px;
+            border-radius: 12px;
+            border: 1px solid #ffe8c3;
+        }
+        .stats-label {
+            color: #7d5a00;
+        }
+        .stats-value {
+            font-weight: 700;
+            color: #c17500;
+        }
+
         /* 图表卡片 */
         .chart-card {
             background: white; border-radius: 28px; padding: 16px 12px 12px 12px;
@@ -116,6 +177,11 @@
 </div>
 
 <div class="container" id="mainApp">
+    <!-- 顶部手动保存按钮 -->
+    <div class="top-bar">
+        <button class="save-btn" id="manualSaveBtn"><i class="fas fa-save"></i> 保存数据</button>
+    </div>
+
     <!-- KPI 卡片 -->
     <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-title"><i class="fas fa-coins"></i> 最新总欠款</div><div class="kpi-number" id="latestTotalDebt">¥0</div><div class="trend-badge" id="debtDateInfo">—</div></div>
@@ -123,6 +189,33 @@
         <div class="kpi-card"><div class="kpi-title"><i class="fas fa-chart-line"></i> 月均消费</div><div class="kpi-number" id="avgMonthlyConsume">¥0</div><div class="trend-badge">工资12.5k+欠款↑+现金↓</div></div>
         <div class="kpi-card"><div class="kpi-title"><i class="fas fa-piggy-bank"></i> 现有存款</div><div class="kpi-number" id="totalDeposit">¥0</div><div class="trend-badge">余额宝+纸币</div></div>
         <div class="kpi-card"><div class="kpi-title"><i class="fas fa-calendar-alt"></i> 最新统计</div><div class="kpi-number" id="latestDateDisplay">—</div><div class="trend-badge">欠款/现金</div></div>
+    </div>
+
+    <!-- 新增：最近记录间隔统计看板 -->
+    <div class="stats-card" id="intervalStats">
+        <div class="stats-title">📊 最近两次记录统计</div>
+        <div class="stats-grid">
+            <div class="stats-item">
+                <span class="stats-label">间隔天数：</span>
+                <span class="stats-value" id="intervalDays">-</span>
+            </div>
+            <div class="stats-item">
+                <span class="stats-label">总消费：</span>
+                <span class="stats-value" id="totalConsume">-</span>
+            </div>
+            <div class="stats-item">
+                <span class="stats-label">日均消费：</span>
+                <span class="stats-value" id="avgDailyConsume">-</span>
+            </div>
+            <div class="stats-item">
+                <span class="stats-label">欠款浮动：</span>
+                <span class="stats-value" id="debtFloat">-</span>
+            </div>
+            <div class="stats-item">
+                <span class="stats-label">存款浮动：</span>
+                <span class="stats-value" id="cashFloat">-</span>
+            </div>
+        </div>
     </div>
 
     <!-- 三图一行 -->
@@ -159,7 +252,7 @@
                             <option value="其他欠款">其他欠款</option>
                         </select>
                         <input type="number" id="debtAmountInput" placeholder="金额" step="0.01" value="0" style="width:100px;">
-                        <input type="date" id="debtDateInput" value="2026-06-01" style="width:120px;">
+                        <input type="date" id="debtDateInput" style="width:120px;">
                         <button id="addDebtQuickBtn" class="btn-primary"><i class="fas fa-save"></i> 新增</button>
                     </div>
                 </div>
@@ -182,7 +275,7 @@
                             <option value="其他现金">其他现金</option>
                         </select>
                         <input type="number" id="cashAmountInput" placeholder="金额" step="0.01" value="0" style="width:100px;">
-                        <input type="date" id="cashDateInput" value="2026-06-01" style="width:120px;">
+                        <input type="date" id="cashDateInput" style="width:120px;">
                         <button id="addCashQuickBtn" class="btn-primary"><i class="fas fa-save"></i> 新增</button>
                     </div>
                 </div>
@@ -261,10 +354,70 @@
     let currentYear = "2026";
     let debtChart, cashChart, consumeChart;
 
+    // 工具函数
     function formatMoneyInt(v) { return Math.round(v).toLocaleString('en-US'); }
+    function formatMoney(v) { return '¥' + v.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }
     function getTotalDebtByDate(d) { return debts.filter(x=>x.date===d).reduce((s,x)=>s+x.amount,0); }
     function getTotalCashByDate(d) { return cashRecords.filter(x=>x.date===d).reduce((s,x)=>s+x.amount,0); }
     function getDepositByDate(d) { return cashRecords.filter(x=>x.date===d && (x.account==="余额宝"||x.account==="纸币")).reduce((s,x)=>s+x.amount,0); }
+    
+    // 计算两个日期相差天数
+    function getDayDiff(date1, date2) {
+        const a = new Date(date1);
+        const b = new Date(date2);
+        const diffTime = Math.abs(b - a);
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    // 获取所有记录日期（去重+排序）
+    function getAllRecordDates() {
+        const debtDates = debts.map(i => i.date);
+        const cashDates = cashRecords.map(i => i.date);
+        const allDates = [...new Set([...debtDates, ...cashDates])];
+        return allDates.sort((a, b) => new Date(a) - new Date(b));
+    }
+
+    // 渲染最近记录统计看板
+    function renderIntervalStats() {
+        const dates = getAllRecordDates();
+        if (dates.length < 2) {
+            document.getElementById('intervalDays').textContent = '数据不足';
+            document.getElementById('totalConsume').textContent = '-';
+            document.getElementById('avgDailyConsume').textContent = '-';
+            document.getElementById('debtFloat').textContent = '-';
+            document.getElementById('cashFloat').textContent = '-';
+            return;
+        }
+
+        // 最近两次日期
+        const lastDate = dates[dates.length - 1];
+        const prevDate = dates[dates.length - 2];
+        const days = getDayDiff(lastDate, prevDate);
+
+        // 计算欠款/存款浮动
+        const lastDebt = getTotalDebtByDate(lastDate);
+        const prevDebt = getTotalDebtByDate(prevDate);
+        const debtChange = lastDebt - prevDebt;
+        const debtFloatText = debtChange >= 0 ? `↑${formatMoneyInt(debtChange)}` : `↓${formatMoneyInt(Math.abs(debtChange))}`;
+
+        const lastCash = getDepositByDate(lastDate);
+        const prevCash = getDepositByDate(prevDate);
+        const cashChange = lastCash - prevCash;
+        const cashFloatText = cashChange >= 0 ? `↑${formatMoneyInt(cashChange)}` : `↓${formatMoneyInt(Math.abs(cashChange))}`;
+
+        // 计算总消费 & 日均消费
+        const debtInc = Math.max(0, lastDebt - prevDebt);
+        const cashDec = Math.max(0, prevCash - lastCash);
+        const totalConsume = 12500 + debtInc + cashDec;
+        const avgDaily = days > 0 ? (totalConsume / days) : 0;
+
+        // 赋值到页面
+        document.getElementById('intervalDays').textContent = `${days} 天`;
+        document.getElementById('totalConsume').textContent = `¥${formatMoneyInt(totalConsume)}`;
+        document.getElementById('avgDailyConsume').textContent = `¥${formatMoneyInt(avgDaily)}`;
+        document.getElementById('debtFloat').textContent = debtFloatText;
+        document.getElementById('cashFloat').textContent = cashFloatText;
+    }
 
     function getYearlyMonthlyData(year, type) {
         const src = type === 'debt' ? debts : cashRecords;
@@ -336,6 +489,8 @@
             document.getElementById('latestDateDisplay').innerHTML = latest;
             document.getElementById('debtDateInfo').innerHTML = `截至 ${latest}`;
         }
+        // 渲染统计看板
+        renderIntervalStats();
         renderAllCharts();
     }
 
@@ -356,19 +511,47 @@
         updateKPI();
     }
 
+    // 数据初始化 / 本地存储
     function initData(){
         debts = FULL_DEBTS_DATA.map((d,i)=>({id:nextDebtId+i, ...d, amount:Number(d.amount.toFixed(2))}));
         cashRecords = FULL_CASH_DATA.map((c,i)=>({id:nextCashId+i, ...c, amount:Number(c.amount)}));
         nextDebtId += debts.length; nextCashId += cashRecords.length;
+        // 初始化后自动保存
+        saveLocal();
     }
-    function saveLocal(){ localStorage.setItem('financeFinalV2', JSON.stringify({debts,cashRecords,nextDebtId,nextCashId})); }
+    // 统一保存函数 - 所有操作都会调用，确保实时保存
+    function saveLocal(){ 
+        localStorage.setItem('financeFinalV2', JSON.stringify({debts,cashRecords,nextDebtId,nextCashId}));
+        console.log('✅ 数据已自动保存到本地');
+    }
+    // 手动保存
+    function manualSave() {
+        saveLocal();
+        alert('✅ 数据已手动保存成功！');
+    }
     function loadLocal(){
         let raw = localStorage.getItem('financeFinalV2');
-        if(raw){ try{ let d=JSON.parse(raw); debts=d.debts; cashRecords=d.cashRecords; nextDebtId=d.nextDebtId; nextCashId=d.nextCashId; }catch(e){ initData(); } }
-        else initData();
-        renderDebtTable(); renderCashTable();
+        if(raw){ 
+            try{ 
+                let d=JSON.parse(raw); 
+                debts=d.debts; 
+                cashRecords=d.cashRecords; 
+                nextDebtId=d.nextDebtId; 
+                nextCashId=d.nextCashId; 
+                console.log('✅ 从本地存储加载数据成功');
+            }catch(e){ 
+                console.error('本地数据损坏，重新初始化', e);
+                initData(); 
+            } 
+        } else {
+            console.log('🆕 首次使用，初始化数据');
+            initData(); 
+        }
+        renderDebtTable(); 
+        renderCashTable();
     }
 
+    // 数据操作（增删改）后 自动保存
     function addDebt(r){ debts.push({id:nextDebtId++, ...r}); renderDebtTable(); saveLocal(); }
     function updateDebt(id,amt){ let idx=debts.findIndex(d=>d.id===id); if(idx!==-1){ debts[idx].amount=amt; renderDebtTable(); saveLocal(); } }
     function deleteDebt(id){ debts=debts.filter(d=>d.id!==id); renderDebtTable(); saveLocal(); }
@@ -401,7 +584,7 @@
         if(e.target.classList.contains('del-debt')) if(confirm('删除?')) deleteDebt(parseInt(e.target.dataset.id));
     });
     document.getElementById('cashTbody').addEventListener('click',(e)=>{
-        if(e.target.classList.contains('edit-cash')){ let id=parseInt(e.target.dataset.id); let c=cashRecords.find(i=>i.id===id); let na=prompt('修改金额',c.amount); if(na) updateCash(id,parseFloat(na)); }
+        if(e.target.classList.contains('edit-cash')){ let id=parseInt(e.target.dataset.id); let c=cashRecords.find(i=>c.id===id); let na=prompt('修改金额',c.amount); if(na) updateCash(id,parseFloat(na)); }
         if(e.target.classList.contains('del-cash')) if(confirm('删除?')) deleteCash(parseInt(e.target.dataset.id));
     });
 
@@ -423,6 +606,16 @@
     function unlock(){ if(pwdInput.value === "864456"){ overlay.style.display='none'; mainApp.style.display='block'; loadLocal(); setTimeout(resizeAllCharts, 200); } else { document.getElementById('pwdError').innerText='密码错误'; pwdInput.value=''; } }
     unlockBtn.onclick = unlock;
     pwdInput.addEventListener('keypress', e=>{ if(e.key === 'Enter') unlock(); });
+
+    // 绑定手动保存按钮
+    document.getElementById('manualSaveBtn').addEventListener('click', manualSave);
+
+    // 设置默认日期为今天
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('debtDateInput').value = today;
+        document.getElementById('cashDateInput').value = today;
+    });
 </script>
 </body>
-</html>
+</html>  
